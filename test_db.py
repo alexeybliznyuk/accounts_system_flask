@@ -5,9 +5,16 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
 
+
+
+login_col = 'login'
+password_col = 'password'
+table_name = 'users'
+login_reqest = 'test_login'
+
 # Подключение к базе данных
 def connect_cursor():
-    global connectection, cursor
+    global connection, cursor
     try:
 
         connection = psycopg2.connect(user="postgres",
@@ -32,6 +39,21 @@ def connect_cursor():
   #          print("Соединение с PostgreSQL закрыто")
 
 
+
+
+
+def close_connect(cursor, connection):
+
+    cursor.close()
+    connection.close()
+    print("Соединение с PostgreSQL закрыто")
+
+
+
+
+
+
+
     #test insert
 def test_insert(cursor):
     cursor.execute(
@@ -42,9 +64,17 @@ def test_insert(cursor):
 
 
 
+#def test_get(cursor):
+ #   cursor.execute(
+#        """SELECT password FROM users WHERE login = 'test_login2';"""
+#    )
+ #   print(cursor.fetchone())
+
+
 def test_get(cursor):
+ #   global password_col, table_name, login_col, login_reqest
     cursor.execute(
-        """SELECT password FROM users WHERE login = 'test_login2';"""
+        f"""SELECT {password_col} FROM {table_name} WHERE {login_col} = '{login_reqest}';"""
     )
     print(cursor.fetchone())
 
@@ -53,19 +83,11 @@ def test_get(cursor):
 
 
 
-
-
-
-connect_cursor()
+#connect_cursor()
 #test_insert(cursor)
-test_get(cursor)
+#test_get(cursor)
 
-
-
-
-
-
-
+#close_connect(cursor, connection)
 
 
 #create table
@@ -101,7 +123,6 @@ test_get(cursor)
 #        """SELECT password FROM users WHERE login = 'test_login';"""
  #   )
  #   print(cursor.fetchone())
-
 
 
 
