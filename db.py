@@ -2,23 +2,66 @@ import psycopg2
 
 from psycopg2 import Error
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-try:
-    # Подключение к базе данных
-    connection = psycopg2.connect(user="postgres",
 
-                                  password="qwerty",
-                                  host="localhost",
-                                  port="5433")
-    connection.autocommit = True
-   # connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-    # Курсор для выполнения операций с базой данных
-    cursor = connection.cursor()
-  #  sql_create_database = 'create database postgres_db'
-  #  cursor.execute(sql_create_database)
+
+
+# Подключение к базе данных
+def connect_cursor():
+    global connectection, cursor
+    try:
+
+        connection = psycopg2.connect(user="postgres",
+
+                                    password="qwerty",
+                                    host="localhost",
+                                    port="5433")
+        connection.autocommit = True
+        cursor = connection.cursor()
+        cursor.execute(
+            "SELECT version();"
+        )
+        print(f"Server version: {cursor.fetchone()}")
+
+
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL", error)
+ #   finally:
+  #      if connection:
+  #          cursor.close()
+  #          connection.close()
+  #          print("Соединение с PostgreSQL закрыто")
+
+
+    #test insert
+def test_insert(cursor):
     cursor.execute(
-        "SELECT version();"
+        """INSERT INTO users (login, password) VALUES
+        ('test_login2', 'test_password2');"""
     )
-    print(f"Server version: {cursor.fetchone()}")
+    print("[INFO] Data was succefully inserted")
+
+
+
+def test_get(cursor):
+    cursor.execute(
+        """SELECT password FROM users WHERE login = 'test_login2';"""
+    )
+    print(cursor.fetchone())
+
+
+
+
+
+
+
+
+
+connect_cursor()
+#test_insert(cursor)
+test_get(cursor)
+
+
+
 
 
 
@@ -52,25 +95,12 @@ try:
    # print("[INFO] Data was succefully inserted")
 
 
+#test get reauest
 
+#    cursor.execute(
+#        """SELECT password FROM users WHERE login = 'test_login';"""
+ #   )
+ #   print(cursor.fetchone())
 
-    cursor.execute(
-        """SELECT password FROM users WHERE login = 'test_login';"""
-    )
-    print(cursor.fetchone())
-
-
-
-
-
-
-
-except (Exception, Error) as error:
-    print("Ошибка при работе с PostgreSQL", error)
-finally:
-    if connection:
-        cursor.close()
-        connection.close()
-        print("Соединение с PostgreSQL закрыто")
 
 
