@@ -3,11 +3,22 @@ import psycopg2
 from psycopg2 import Error
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
+import requests
+import json
+
+
+login_col = 'login'
+password_col = 'password'
+table_name = 'users'
+login_request = 'test_login2'
+password_request = 'test_password2'
+#id_request = "1"
+
 
 
 # Подключение к базе данных
 def connect_cursor():
-    global connectection, cursor
+    global connection, cursor
     try:
 
         connection = psycopg2.connect(user="postgres",
@@ -32,40 +43,74 @@ def connect_cursor():
   #          print("Соединение с PostgreSQL закрыто")
 
 
+
+
+
+def close_connect(cursor, connection):
+
+    cursor.close()
+    connection.close()
+    print("Соединение с PostgreSQL закрыто")
+
+
+
+
+
+
+
     #test insert
 def test_insert(cursor):
     cursor.execute(
-        """INSERT INTO users (login, password) VALUES
-        ('test_login2', 'test_password2');"""
+        f"""INSERT INTO users ({login_col}, {password_col}) VALUES
+        ('{login_request}', '{password_request}');"""
     )
     print("[INFO] Data was succefully inserted")
 
 
 
-def test_get(cursor):
+#def test_get(cursor):
+ #   cursor.execute(
+#        """SELECT password FROM users WHERE login = 'test_login2';"""
+#    )
+ #   print(cursor.fetchone())
+
+
+def test_get(cursor, login_request):
+ #   global password_col, table_name, login_col, login_reqest
     cursor.execute(
-        """SELECT password FROM users WHERE login = 'test_login2';"""
+        f"""SELECT {password_col} FROM {table_name} WHERE {login_col} = '{login_request}';"""
     )
-    print(cursor.fetchone())
+ #   answer = {'login': login_request, 'password':cursor.fetchone()[0]}
+
+ #   return answer
+    cursor_fetch = cursor.fetchone()
+    if cursor_fetch == None:
+
+        answer = {'login': login_request, 'password': cursor_fetch}
+        return answer
 
 
 
 
+    else:
+        cursor.execute(
+            f"""SELECT id FROM {table_name} WHERE {login_col} = '{login_request}';"""
+        )
+        account_id = cursor.fetchone()
+        answer = {'login': login_request, 'password': cursor_fetch[0], 'id': account_id[0]}
+        return answer
+
+#    else:
+ #       answer = {'login': login_request, 'password': cursor.fetchone()}
+ #       return answer
 
 
-
-
-
-connect_cursor()
+#connect_cursor()
 #test_insert(cursor)
-test_get(cursor)
-
-
-
-
-
-
-
+#print(test_get(cursor, login_request))
+#print(str(type(test_get(cursor, 'test_login'))))
+#rint(json.dumps(test_get(cursor, 'test_login')))
+#close_connect(cursor, connection)
 
 
 #create table
@@ -101,6 +146,12 @@ test_get(cursor)
 #        """SELECT password FROM users WHERE login = 'test_login';"""
  #   )
  #   print(cursor.fetchone())
+
+
+
+
+
+
 
 
 
