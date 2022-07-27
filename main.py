@@ -9,28 +9,16 @@ import db
 app = Flask(__name__)
 api = Api()
 db.connect_cursor()
-accounts = {
-    1: {"login": "Python", "password": "rty"},
-    2: {"login": "Java", "password": "qwe"}
-}
 
+
+#parser = reqparse.RequestParser()
+#parser.add_argument("name", type=str)
+#parser.add_argument("password", type=int)
 
 
 class Main(Resource):
-    def get(self, account_id):
-        answer = db.test_get(db.cursor, 'test_login')
 
-        return answer
-#        if account_id == 0:
- #           return accounts
-#        else:
- #           return accounts[account_id]
-
-    def delete(self, account_id):
-        del accounts[account_id]
-        return accounts
-
-    def post(self, account_id):
+    def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument("login", type=str)
         parser.add_argument("password", type=str)
@@ -51,16 +39,35 @@ class Main(Resource):
 
 
 
-    def put(self, account_id):
+
+
+api.add_resource(Main, "/api/login")
+#api.init_app(app)
+
+
+
+
+class Registration(Resource):
+
+    def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument("login", type=str)
         parser.add_argument("password", type=str)
-        accounts[account_id] = parser.parse_args()
-        return accounts
+        account_data = parser.parse_args()
+        answer = db.reg(db.cursor, account_data['login'], account_data['password'])
+        return answer
 
 
-api.add_resource(Main, "/api/courses/<int:account_id>")
+
+
+
+api.add_resource(Registration, "/api/reg")
 api.init_app(app)
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=3000, host="127.0.0.1")
