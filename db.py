@@ -10,8 +10,8 @@ import json
 login_col = 'login'
 password_col = 'password'
 table_name = 'users'
-login_request = 'test_login2'
-password_request = 'test_password2'
+#login_request = 'test_login2'
+#password_request = 'test_password3'
 #id_request = "1"
 
 
@@ -105,8 +105,41 @@ def test_get(cursor, login_request):
  #       return answer
 
 
+
+
+
+
+def check_presence(cursor, login):
+ #   global password_col, table_name, login_col, login_reqest
+    cursor.execute(
+        f"""SELECT id FROM {table_name} WHERE {login_col} = '{login}';"""
+    )
+    account_id = cursor.fetchone()
+ #   print(account_id)
+    if account_id == None:
+        return "This login is free"
+    else:
+        return "This login already used"
+
+
+def reg(cursor, login, password):
+    presence = check_presence(cursor, login)
+    if presence == "This login is free":
+        cursor.execute(
+            f"""INSERT INTO users ({login_col}, {password_col}) VALUES
+            ('{login}', '{password}');"""
+        )
+        cursor.execute(
+            f"""SELECT id FROM {table_name} WHERE {login_col} = '{login}';"""
+        )
+        account_id = cursor.fetchone()
+        return account_id[0]
+    else:
+        return presence
+
 #connect_cursor()
 #test_insert(cursor)
+#print(reg(cursor, login_request, password_request))
 #print(test_get(cursor, login_request))
 #print(str(type(test_get(cursor, 'test_login'))))
 #rint(json.dumps(test_get(cursor, 'test_login')))
